@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <title>Login Page</title>
+</head>
+
+<body class="bg-gray-100">
+  <div class="flex h-screen">
+    <!-- Info  -->
+    <div class="w-1/2 flex flex-col justify-center items-center bg-gray-900 text-white">
+      <h1 class="text-4xl font-bold mb-6">Budgeting App 2.0</h1>
+      <p class="text-lg">Welcome to Budgeting App 2.0. Manage your finances with ease!</p>
+    </div>
+
+    <!-- Functionality -->
+    <div class="w-1/2 flex flex-col justify-center items-center">
+      <!-- Tabs -->
+      <div class="flex mb-8">
+        <button id="tabLogin" class="py-2 px-4 bg-gray-900 text-white font-medium">Login</button>
+        <button id="tabRegister" class="py-2 px-4 bg-gray-300 text-gray-700 font-medium">Register</button>
+      </div>
+
+      <!-- Login Section -->
+      <div id="sectionLogin" class="w-64">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2" for="inpLoginUsername">Username</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="text" id="inpLoginUsername" name="username" placeholder="Enter your username">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2" for="inpLoginPassword">Password</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="password" id="inpLoginPassword" name="password" placeholder="Enter your password">
+        </div>
+        <button class="w-full py-2 px-4 bg-gray-900 text-white font-medium mb-2" id="btnLogin" type="submit">Login</button>
+        <p id="errorLogin" class="text-red-600 text-sm font-medium mb-2"></p>
+      </div>
+
+      <!-- Registration Section -->
+      <div id="sectionRegister" class="w-64" style="display: none;">
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2" for="inpRegisterUsername">Username</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="text" id="inpRegisterUsername" name="username" placeholder="Choose a username">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2" for="inpRegisterPassword">Password</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="password" id="inpRegisterPassword" name="password" placeholder="Choose a password">
+        </div>
+        <div class="mb-4">
+          <label class="block text-gray-700 text-sm font-medium mb-2" for="inpRegisterConfirmPassword">Confirm Password</label>
+          <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="password" id="inpRegisterConfirmPassword" name="confirm-password" placeholder="Confirm your password">
+        </div>
+        <button class="w-full py-2 px-4 bg-gray-900 text-white font-medium" id="btnRegister" type="submit">Register</button>
+        <p id="errorRegister" class="text-red-600 text-sm font-medium mb-2"></p>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="../../shared/shared.js"></script>
+<script src="login.js"></script>
+</html>
+
+
