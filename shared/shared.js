@@ -1,4 +1,5 @@
 const KEY_USER = "keyCurrentUser"
+const KEY_ACCOUNT = "keyCurrentAccount"
 
 // class representing an object that has a corresponding entry in the SQL database
 class DatabaseObj {

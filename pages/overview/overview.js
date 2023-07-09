@@ -127,9 +127,12 @@ function generateTableData(grouping,date) {
 
 function editAccount(userID,accID) {
   console.log(`edit: ${userID} ${accID}`)
+  localStorage.setItem(KEY_ACCOUNT, accID);
+  window.location = "../accountTransactions/accountTransactions.html"
 }
 function deleteAccount(userID,accID) {
   console.log(`delete: ${userID} ${accID}`)
+  DatabaseObj.runSQL(`DELETE FROM account WHERE user_id = ${userID} AND acc_id = ${accID}`).then(() => {console.log("account deleted!"); updateDateSelected()})
 }
 
 function updateDateSelected() {
@@ -146,5 +149,18 @@ inpDate.addEventListener('change', updateDateSelected);
 optionDay.addEventListener('change', updateDateSelected);
 optionMonth.addEventListener('change', updateDateSelected);
 optionYear.addEventListener('change', updateDateSelected);
+
+const inpAccName = document.getElementById('inpAccName');
+const btnAddAccount = document.getElementById('btnAddAccount');
+
+btnAddAccount.addEventListener('click',() => {
+  let userID = User.findUserByName(localStorage.getItem(KEY_USER)).id
+  if(inpAccName.value!='') {
+    let acc = new Account(0,userID,inpAccName.value,0,false)
+    acc.insert(["acc_id"]).then(() => {console.log("account inserted!"); updateDateSelected()})
+  }
+  
+})
+
 
 User.selectAll().then(() => Account.selectAll()).then(() => Transaction.selectAll()).then(() => main());
