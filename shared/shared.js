@@ -31,6 +31,26 @@ class DatabaseObj {
             }
         );
     }
+
+    static runSQLSelect(sql) {
+        return DatabaseObj.runSQL(sql)
+        .then((response) => {
+            if (response.ok) {
+              return response.text(); // Read response as text
+            } else {
+              throw new Error('Request failed');
+            }
+          })
+          .then((responseText) => {
+            // Check if the response text indicates empty results
+            if (responseText.trim() === 'No data found.') {
+              return []; // Return an empty array if no data is found
+            } else {
+              return JSON.parse(responseText); // Parse the response as JSON
+            }
+        });
+    }
+
     // constructor
     // tableName: the name of the table that the object is in
     // attributes: an object with the names of each attribute and their corresponding values
@@ -164,20 +184,20 @@ class User extends DatabaseObj {
 class Account extends DatabaseObj {
     static objList = [];
     constructor(accID,userID,accName,accStartAmount,insertIntoDatabase=true) {
-        super("user",{"acc_id" : accID,"user_id" : userID, "acc_name" : accName, "acc_start_amount" : accStartAmount},["acc_id","user_id"],Account.objList,insertIntoDatabase)
+        super("account",{"acc_id" : accID,"user_id" : userID, "acc_name" : accName, "acc_start_amount" : accStartAmount},["acc_id","user_id"],Account.objList,insertIntoDatabase)
     }
 
-    get accID() {return this._attributes["acc_id"]}
+    get id() {return this._attributes["acc_id"]}
     get userID() {return this._attributes["user_id"]}
-    get accName() {return this._attributes["acc_name"]}
-    get accStartAmount() {return this._attributes["acc_start_amount"]}
+    get name() {return this._attributes["acc_name"]}
+    get startAmount() {return this._attributes["acc_start_amount"]}
 
-    set accID(_accID) {this.update("acc_id",_accID)}
+    set id(_accID) {this.update("acc_id",_accID)}
     set userID(_userID) {this.update("user_id",_userID)}
-    set accName(_accName) {this.update("acc_name",_accName)}
-    set accStartAmount(_accStartAmount) {this.update("acc_start_amount",_accStartAmount)}
+    set name(_accName) {this.update("acc_name",_accName)}
+    set startAmount(_accStartAmount) {this.update("acc_start_amount",_accStartAmount)}
 
-    insert() {return super.insert(Account.objList)}
+    insert(ignoreList=[]) {return super.insert(Account.objList,ignoreList)}
     delete() {return super.delete(Account.objList)}
 
 
@@ -186,7 +206,123 @@ class Account extends DatabaseObj {
     }
 
     static selectAll() {
-        User.objList = []
-        return DatabaseObj.selectAll("user",(data)=>User.fromJson(data));
+        Account.objList = []
+        return DatabaseObj.selectAll("account",(data)=>Account.fromJson(data));
+    }
+}
+
+class Category extends DatabaseObj {
+    static objList = [];
+    constructor(catID,userID,catName,insertIntoDatabase=true) {
+        super("category",{"cat_id" : catID,"user_id" : userID, "cat_name" : catName},["cat_id","user_id"],Category.objList,insertIntoDatabase)
+    }
+
+    get id() {return this._attributes["cat_id"]}
+    get userID() {return this._attributes["user_id"]}
+    get name() {return this._attributes["cat_name"]}
+
+    set id(_catID) {this.update("cat_id",_catID)}
+    set userID(_userID) {this.update("user_id",_userID)}
+    set name(_catName) {this.update("cat_name",_catName)}
+
+    insert(ignoreList=[]) {return super.insert(Category.objList,ignoreList)}
+    delete() {return super.delete(Category.objList)}
+
+
+    static fromJson(data) {
+        return new Category(Number(data["cat_id"]),Number(data["user_id"]),data["cat_name"],false)
+    }
+
+    static selectAll() {
+        Category.objList = []
+        return DatabaseObj.selectAll("category",(data)=>Category.fromJson(data));
+    }
+}
+
+class Transaction extends DatabaseObj {
+    static objList = [];
+    constructor(transID,userID,transDate,transAmount,accID,catID, transDesc, transTransID, insertIntoDatabase=true) {
+        super("transaction",
+            {
+                "trans_id" : transID,
+                "user_id" : userID, 
+                "trans_date" : transDate, 
+                "trans_amount" : transAmount, 
+                "acc_id" : accID, 
+                "cat_id" : catID, 
+                "trans_desc" : transDesc, 
+                "trans_transfer_id" : transTransID
+            },
+                ["trans_id"],Transaction.objList,insertIntoDatabase)
+    }
+
+    get id() {return this._attributes["trans_id"]}
+    get userID() {return this._attributes["user_id"]}
+    get date() {return this._attributes["trans_date"]}
+    get amount() {return this._attributes["trans_amount"]}
+    get accID() {return this._attributes["acc_id"]}
+    get catID() {return this._attributes["cat_id"]}
+    get desc() {return this._attributes["trans_desc"]}
+    get transferID() {return this._attributes["trans_transfer_id"]}
+
+    set id(_transID) {this.update("trans_id",_transID)}
+    set userID(_userID) {this.update("user_id",_userID)}
+    set date(_transDate) {this.update("trans_date",_transDate)}
+    set amount(_transAmount) {this.update("trans_amount",_transAmount)}
+    set accID(_accID) {this.update("acc_id",_accID)}
+    set catID(_catID) {this.update("cat_id",_catID)}
+    set desc(_transDesc) {this.update("trans_desc",_transDesc)}
+    set transferID(_transTransID) {this.update("trans_transfer_id",_transTransID)}
+
+    insert(ignoreList=[]) {return super.insert(Transaction.objList,ignoreList)}
+    delete() {return super.delete(Transaction.objList)}
+
+
+    static fromJson(data) {
+        return new Transaction(
+            Number(data["trans_id"]),
+            Number(data["user_id"]),
+            Date(data["trans_date"]),
+            Number(data["trans_amount"]),
+            Number(data["acc_id"]),
+            Number( data["cat_id"]),
+            data["trans_desc"],
+            Number(data["trans_transfer_id"]),
+            false)
+    }
+
+    static selectAll() {
+        Transaction.objList = []
+        return DatabaseObj.selectAll("transaction",(data)=>Transaction.fromJson(data));
+    }
+}
+
+class Audit extends DatabaseObj {
+    static objList = [];
+    constructor(auditID,auditDate,auditAmount,accID,insertIntoDatabase=true) {
+        super("audit",{"audit_id" : auditID,"audit_date" : auditDate, "audit_amount" : auditAmount, "acc_id" : accID},["audit_id"],Account.objList,insertIntoDatabase)
+    }
+
+    get id() {return this._attributes["audit_id"]}
+    get date() {return this._attributes["audit_date"]}
+    get amount() {return this._attributes["audit_amount"]}
+    get accID() {return this._attributes["acc_id"]}
+
+    set id(_auditID) {this.update("audit_id",_auditID)}
+    set date(_auditDate) {this.update("audit_date",_auditDate)}
+    set amount(_auditAmount) {this.update("audit_amount",_auditAmount)}
+    set accID(_accID) {this.update("acc_id",_accID)}
+
+    insert(ignoreList=[]) {return super.insert(Audit.objList,ignoreList)}
+    delete() {return super.delete(Audit.objList)}
+
+
+    static fromJson(data) {
+        return new Audit(Number(data["audit_id"]),Date(data["audit_date"]),data["audit_amount"],Number(data["acc_id"]),false)
+    }
+
+    static selectAll() {
+        Audit.objList = []
+        return DatabaseObj.selectAll("audit",(data)=>Audit.fromJson(data));
     }
 }

@@ -68,7 +68,7 @@ btnLogin.addEventListener('click', () => {
         errorLogin.innerHTML = "incorrect password"
     }
     else {
-        localStorage.setItem(KEY_USERID, user.id);
+        localStorage.setItem(KEY_USER, user.name);
         window.location = "../overview/overview.html"
     }
 
