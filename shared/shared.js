@@ -130,7 +130,13 @@ class DatabaseObj {
     }
     // get all entries of a table
     static selectAll(tableName,fromJsonFunc) {
+        return DatabaseObj.selectWithCondition(tableName,null,fromJsonFunc)
+    }
+    static selectWithCondition(tableName,cond,fromJsonFunc) {
         let sql = `SELECT * FROM ${tableName}`;
+        if(cond!=null) {
+            sql += ` WHERE ${cond}`
+        }
         return DatabaseObj.runSQL(sql).then((data)=>data.json()).then(
             (data) => {
                 console.log("data: " + data)
@@ -168,8 +174,11 @@ class User extends DatabaseObj {
     }
 
     static selectAll() {
+        return User.selectWithCondition(null)
+    }
+    static selectWithCondition(cond) {
         User.objList = []
-        return DatabaseObj.selectAll("user",(data)=>User.fromJson(data));
+        return DatabaseObj.selectWithCondition("user",cond,(data)=>User.fromJson(data));
     }
 
     static findUserByName(name) {
@@ -207,8 +216,11 @@ class Account extends DatabaseObj {
     }
 
     static selectAll() {
+        return Account.selectWithCondition(null)
+    }
+    static selectWithCondition(cond) {
         Account.objList = []
-        return DatabaseObj.selectAll("account",(data)=>Account.fromJson(data));
+        return DatabaseObj.selectWithCondition("account",cond,(data)=>Account.fromJson(data));
     }
 }
 
@@ -235,8 +247,11 @@ class Category extends DatabaseObj {
     }
 
     static selectAll() {
+        return Category.selectWithCondition(null)
+    }
+    static selectWithCondition(cond) {
         Category.objList = []
-        return DatabaseObj.selectAll("category",(data)=>Category.fromJson(data));
+        return DatabaseObj.selectWithCondition("category",cond,(data)=>Category.fromJson(data));
     }
 }
 
@@ -293,8 +308,20 @@ class Transaction extends DatabaseObj {
     }
 
     static selectAll() {
+        return Transaction.selectWithCondition(null)
+    }
+    static selectWithCondition(cond) {
         Transaction.objList = []
-        return DatabaseObj.selectAll("transaction",(data)=>Transaction.fromJson(data));
+        return DatabaseObj.selectWithCondition("transaction",cond,(data)=>Transaction.fromJson(data));
+    }
+
+    static findTransactionByID(transID) {
+        for(let trans of Transaction.objList) {
+            if(trans.id==transID) {
+                return trans
+            }
+        }
+        return null;
     }
 }
 
@@ -323,7 +350,10 @@ class Audit extends DatabaseObj {
     }
 
     static selectAll() {
+        return Audit.selectWithCondition(null)
+    }
+    static selectWithCondition(cond) {
         Audit.objList = []
-        return DatabaseObj.selectAll("audit",(data)=>Audit.fromJson(data));
+        return DatabaseObj.selectWithCondition("audit",cond,(data)=>Audit.fromJson(data));
     }
 }

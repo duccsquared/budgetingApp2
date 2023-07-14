@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Budgeting App</title>
+        <!-- <link href="../../output.css" rel="stylesheet"> -->
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    </head>
+    <body>
+        <!-- navbar -->
+        <div class="flex flex-wrap place-items-center">
+            <!-- navbar -->
+            <nav class="flex justify-between bg-gray-900 text-white w-screen">
+                <div class="px-5 xl:px-12 py-6 flex w-full items-center">
+                    <a class="text-3xl font-bold font-heading" href="../overview/overview.html">
+                    <!-- <img class="h-9" src="logo.png" alt="logo"> -->
+                    Budgeting App 2.0
+                    </a>
+                    <!-- Nav Links -->
+                    <ul class="hidden md:flex px-4 mx-auto font-semibold font-heading space-x-12">
+                    <!-- <li><a class="hover:text-gray-200" href="#">Home</a></li> -->
+                    </ul>
+                    <!-- Sign In / Register      -->
+                    <a class="flex items-center hover:text-gray-200" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hover:text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </a>
+                    
+                </div>
+            </nav>
+        </div>
+        <!-- main body -->
+        <div>
+            <div style="height: 20px"></div>
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-1"></div>
+                <div class="col-span-3">
+                    <!-- title section -->
+                    <div>
+                        <h2 class="text-2xl">Account</h2> 
+                        <div style="height: 20px"></div>
+                    </div>
+                    <!-- info section -->
+                    <div>
+                        <div class="space-y-2 shadow-md p-5" style="display: inline-block;">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 text-sm font-medium mb-2" for="inpLoginPassword">Starting value</label>
+                                <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="password" id="inpLoginPassword" name="password" placeholder="Enter starting value">
+                            </div>
+                            <div class="mb-4">
+                                <p>current value: 0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-7">
+                    <!-- date selection section -->
+                    <div>
+                        <div style="padding: 10px; display: inline-block;">
+                            <div class="shadow-md p-2 container mx-auto">
+                                <div class="flex">
+                                    <div class="mb-8 mr-4">
+                                        <p class="mb-2">Group by:</p>
+                                        <div class="flex">
+                                          <label class="mr-4">
+                                            <input type="radio" name="grouping" id="optionDay" value="day" checked>
+                                            <span class="ml-2">Day</span>
+                                          </label>
+                                          <label class="mr-4">
+                                            <input type="radio" name="grouping" id="optionMonth" value="month">
+                                            <span class="ml-2">Month</span>
+                                          </label>
+                                          <label>
+                                            <input type="radio" name="grouping" id="optionYear" value="year">
+                                            <span class="ml-2">Year</span>
+                                          </label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p class="mb-2">Select date:</p>
+                                        <input class="w-48 px-3 py-2 border border-gray-300 rounded-md" type="date" id="inpDate">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- table section -->
+                    <div>
+                        <div class="flex flex-col shadow-md">
+                            <div class="overflow-x-auto sm:-mx-6 lg:-mx-8">
+                                <div class="inline-block min-w-full py-2 sm:px-6 lg:px-8">
+                                <div class="overflow-hidden" style="max-height: 400px; overflow-y: auto;">
+                                    <table id="tableAccount" class="min-w-full text-left text-sm font-light">
+                                    <thead class="border-b font-medium dark:border-neutral-500">
+                                        <tr>
+                                        <th scope="col" class="px-6 py-4">date</th>
+                                        <th scope="col" class="px-6 py-4">amount</th>
+                                        <th scope="col" class="px-6 py-4">category</th>
+                                        <th scope="col" class="px-6 py-4">notes</th>
+                                        <th scope="col" class="px-6 py-4"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbodyTrans">
+                                        <tr
+                                        class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600">
+                                        <td class="whitespace-nowrap px-6 py-4"><p>loading...</p></td>
+                                        <td class="whitespace-nowrap px-6 py-4"><p>loading...</p></td>
+                                        <td class="whitespace-nowrap px-6 py-4"><p>loading...</p></td>
+                                        <td class="whitespace-nowrap px-6 py-4"><p>loading...</p></td>
+                                        <td class="whitespace-nowrap px-6 py-4">
+                                            <p>loading...</p>
+                                        </td>
+                                        </tr>
+
+                                    </tbody>
+                                    </table>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-span-1"></div>
+            </div>
+            <script src="../../shared/shared.js"></script>
+            <script src="accountTransactions.js"></script>
+        </div>
+    </body>
+</html>
