@@ -2,6 +2,7 @@ console.log(localStorage.getItem(KEY_USER))
 
 
 const tbodyAccount = document.getElementById('tbodyAccount');
+const tbodyCategory = document.getElementById('tbodyCategory');
 
 const loginTab = document.getElementById('tabLogin');
 
@@ -15,6 +16,7 @@ function main() {
   optionMonth.checked = true;
   inpDate.value = new Date().toISOString().slice(0, 10);
   generateTableData("MONTH",new Date(inpDate.value))
+  generateCategoryTableData()
 }
 
 function getJsonChildByKey(str,val,data, def = {}) {
@@ -125,6 +127,50 @@ function generateTableData(grouping,date) {
     })
 }
 
+function generateCategoryTableData() {
+  let command = "" +
+  "SELECT cat_id, cat_name " +
+  "FROM category " +
+  "JOIN user ON (category.user_id = user.user_id) " +
+  `WHERE UPPER(user_name) = UPPER("${localStorage.getItem(KEY_USER)}");`
+  console.log(command)
+  DatabaseObj.runSQLSelect(command)
+  .then((jsonData) => {
+    console.log(jsonData)
+    tbodyCategory.innerHTML = ""
+    for(let subData of jsonData) {
+      let catID = Math.round(subData["cat_id"])
+      tbodyCategory.innerHTML += `
+      <tr
+      class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600">
+      <td class="whitespace-nowrap px-6 py-4" id="tdCatName${catID}">${subData["cat_name"]}</td>
+      <td class="whitespace-nowrap px-6 py-4">
+          <button><i id="btnDelete${catID}" class="bi bi-trash"></i></button>
+      </td>
+      </tr>
+      `
+    }
+    tbodyCategory.innerHTML += `
+    <tr
+    class="border-b transition duration-300 ease-in-out hover:bg-neutral-100 dark:border-neutral-500 dark:hover:bg-neutral-600">
+    <td class="whitespace-nowrap px-6 py-4">
+        <input class="w-full px-3 py-2 border border-gray-300 rounded-md" type="text" id="inpCatName" name="name">
+    </td>
+    <td class="whitespace-nowrap px-6 py-4">
+        <button><i id="btnAddCat" class="bi bi-plus-square"></i></button>
+    </td>
+    </tr>
+    `
+    for(let subData of jsonData) {
+      let catID = Math.round(subData["cat_id"])
+      document.getElementById(`btnDelete${catID}`).addEventListener('click',() => deleteCategory(catID))
+    }
+
+    document.getElementById(`btnAddCat`).addEventListener('click',() => addCategory())
+
+  })
+}
+
 function editAccount(userID,accID) {
   console.log(`edit: ${userID} ${accID}`)
   localStorage.setItem(KEY_ACCOUNT, accID);
@@ -133,6 +179,20 @@ function editAccount(userID,accID) {
 function deleteAccount(userID,accID) {
   console.log(`delete: ${userID} ${accID}`)
   DatabaseObj.runSQL(`DELETE FROM account WHERE user_id = ${userID} AND acc_id = ${accID}`).then(() => {console.log("account deleted!"); updateDateSelected()})
+}
+
+function addCategory() {
+  let inpCatName = document.getElementById("inpCatName")
+  if(inpCatName.value!='') {
+    let userID = User.findUserByName(localStorage.getItem(KEY_USER)).id
+    let acc = new Category(null,userID,inpCatName.value,false)
+    acc.insert(["cat_id"]).then(() => {console.log("category inserted!"); generateCategoryTableData()})
+  }
+}
+function deleteCategory(catID) {
+  let userID = User.findUserByName(localStorage.getItem(KEY_USER)).id
+  DatabaseObj.runSQL(`DELETE FROM category WHERE user_id = ${userID} AND cat_id = ${catID}`).then(() => {console.log("category deleted!"); generateCategoryTableData()})
+
 }
 
 function updateDateSelected() {
