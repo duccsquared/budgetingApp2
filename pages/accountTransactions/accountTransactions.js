@@ -6,10 +6,20 @@ const optionDay = document.getElementById('optionDay');
 const optionMonth = document.getElementById('optionMonth');
 const optionYear = document.getElementById('optionYear');
 
+const inpStartValue = document.getElementById('inpStartValue');
+const txtCurrentValue = document.getElementById('txtCurrentValue');
+
 function main() {
+    let acc = Account.findAccountByID(Number(localStorage.getItem(KEY_ACCOUNT)))
+    inpStartValue.value = acc.startAmount
+    inpStartValue.addEventListener("change",() => {
+        acc.startAmount = Number(inpStartValue.value)
+        updateAccountCurrentValue()
+    })
     optionMonth.checked = true;
     inpDate.value = new Date().toISOString().slice(0, 10);
     generateTableData("MONTH",new Date(inpDate.value))
+    updateAccountCurrentValue()
 }
 
 function generateTableData(grouping,date) {
@@ -144,7 +154,7 @@ function setTransactionAsEditable(transID) {
     console.log(selTransCategory.value)
 
     inpTransDate.addEventListener("change", () => {transaction.date = inpTransDate.value});
-    inpTransAmount.addEventListener("change", () => {transaction.amount = inpTransAmount.value});
+    inpTransAmount.addEventListener("change", () => {transaction.amount = inpTransAmount.value; updateAccountCurrentValue()});
     selTransCategory.addEventListener("change", () => {transaction.catID = selTransCategory.value});
     inpTransDesc.addEventListener("change", () => {transaction.desc = inpTransDesc.value});
 }
@@ -174,7 +184,7 @@ function setTransactionAsNonEditable(transID) {
 function deleteTransaction(transID) {
     console.log(`delete: ${transID}`)
     let userID = User.findUserByName(localStorage.getItem(KEY_USER)).id
-    DatabaseObj.runSQL(`DELETE FROM transaction WHERE user_id = ${userID} AND trans_id = ${transID}`).then(() => {console.log("transaction deleted!"); updateDateSelected()})
+    DatabaseObj.runSQL(`DELETE FROM transaction WHERE user_id = ${userID} AND trans_id = ${transID}`).then(() => {console.log("transaction deleted!"); updateDateSelected(); updateAccountCurrentValue()})
 }
 
 
@@ -189,7 +199,7 @@ function addTransaction() {
     let accID = Number(localStorage.getItem(KEY_ACCOUNT))
     let transaction = new Transaction(null,userID,inpTransDate.value,inpTransAmount.value,
         accID,selTransCategory.value,inpTransDesc.value,null,false)
-    transaction.insert(["trans_id","trans_transfer_id"]).then(() => {console.log("transaction inserted!"); updateDateSelected()})
+    transaction.insert(["trans_id","trans_transfer_id"]).then(() => {console.log("transaction inserted!"); updateDateSelected(); updateAccountCurrentValue()})
 }       
 
 function updateDateSelected() {
@@ -204,6 +214,23 @@ function updateDateSelected() {
     generateTableData(grouping.toUpperCase(),new Date(date))
 }
 
+function updateAccountCurrentValue() {
+    let command = "" +
+    "SELECT SUM(trans_amount) AS sum_amount " +
+    "FROM transaction " +
+    "JOIN user ON (transaction.user_id = user.user_id) " +
+    `WHERE UPPER(user_name) = UPPER("${localStorage.getItem(KEY_USER)}") AND acc_id=${localStorage.getItem(KEY_ACCOUNT)} `
+    ";"
+    console.log(command)
+    DatabaseObj.runSQLSelect(command)
+    .then((jsonData) => {
+        console.log(jsonData)
+        let currentValue = Number(inpStartValue.value) + Number(jsonData[0]["sum_amount"])
+        txtCurrentValue.innerHTML = `current value: ${currentValue}`
+    })
+
+}
+
 inpDate.addEventListener('change', updateDateSelected);
 optionDay.addEventListener('change', updateDateSelected);
 optionMonth.addEventListener('change', updateDateSelected);
@@ -211,5 +238,6 @@ optionYear.addEventListener('change', updateDateSelected);
 
 User.selectAll()
 .then(()=>Category.selectWithCondition(`user_id = ${User.findUserByName(localStorage.getItem(KEY_USER)).id}`))
+.then(()=>Account.selectWithCondition(`user_id = ${User.findUserByName(localStorage.getItem(KEY_USER)).id}`))
 .then(()=>Transaction.selectWithCondition(`user_id = ${User.findUserByName(localStorage.getItem(KEY_USER)).id}`))
 .then(()=>main())

@@ -222,6 +222,15 @@ class Account extends DatabaseObj {
         Account.objList = []
         return DatabaseObj.selectWithCondition("account",cond,(data)=>Account.fromJson(data));
     }
+
+    static findAccountByID(accID) {
+        for(let acc of Account.objList) {
+            if(acc.id==accID) {
+                return acc
+            }
+        }
+        return null;
+    }
 }
 
 class Category extends DatabaseObj {
