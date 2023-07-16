@@ -137,7 +137,7 @@ class DatabaseObj {
         if(cond!=null) {
             sql += ` WHERE ${cond}`
         }
-        return DatabaseObj.runSQL(sql).then((data)=>data.json()).then(
+        return DatabaseObj.runSQLSelect(sql).then(
             (data) => {
                 console.log("data: " + data)
                 let resultList = [];
