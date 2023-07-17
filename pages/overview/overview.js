@@ -4,7 +4,6 @@ console.log(localStorage.getItem(KEY_USER))
 const tbodyAccount = document.getElementById('tbodyAccount');
 const tbodyCategory = document.getElementById('tbodyCategory');
 
-const loginTab = document.getElementById('tabLogin');
 
 const inpDate = document.getElementById('inpDate');
 const optionDay = document.getElementById('optionDay');
@@ -17,6 +16,7 @@ function main() {
   inpDate.value = new Date().toISOString().slice(0, 10);
   generateTableData("MONTH",new Date(inpDate.value))
   generateCategoryTableData()
+  updateTransferOptions()
 }
 
 function getJsonChildByKey(str,val,data, def = {}) {
@@ -222,5 +222,82 @@ btnAddAccount.addEventListener('click',() => {
   
 })
 
+// Tab switching functionality
+const tabCategory = document.getElementById('tabCategory');
+const tabTransfer = document.getElementById('tabTransfer');
+const sectionCategory = document.getElementById('sectionCategory');
+const sectionTransfer = document.getElementById('sectionTransfer');
 
-User.selectAll().then(() => Account.selectAll()).then(() => Transaction.selectAll()).then(() => main());
+tabCategory.addEventListener('click', () => {
+    tabCategory.classList.add('bg-gray-900', 'text-white');
+    tabTransfer.classList.add('bg-gray-300','text-gray-700');
+    tabCategory.classList.remove('bg-gray-300','text-gray-700');
+    tabTransfer.classList.remove('bg-gray-900', 'text-white');
+    
+    sectionCategory.style.display = 'block';
+    sectionTransfer.style.display = 'none';
+});
+
+tabTransfer.addEventListener('click', () => {
+    tabTransfer.classList.add('bg-gray-900', 'text-white');
+    tabCategory.classList.add('bg-gray-300','text-gray-700');
+    tabTransfer.classList.remove('bg-gray-300','text-gray-700');
+    tabCategory.classList.remove('bg-gray-900', 'text-white');
+
+    sectionCategory.style.display = 'none';
+    sectionTransfer.style.display = 'block';
+});
+
+const inpTransferDate = document.getElementById("inpTransferDate")
+const selTransferAccountFrom = document.getElementById("selTransferAccountFrom")
+const selTransferAccountTo = document.getElementById("selTransferAccountTo")
+const inpTransferAmount = document.getElementById("inpTransferAmount")
+const selTransferCategory = document.getElementById("selTransferCategory")
+const inpTransferDesc = document.getElementById("inpTransferDesc")
+
+function updateTransferOptions() {
+  let accountHTML = ""
+  for(let account of Account.objList) {
+    accountHTML += `<option value=${account.id}>${account.name}</option>`
+  }
+
+  let categoryHTML = ""
+  for(let category of Category.objList) {
+      categoryHTML += `<option value=${category.id}>${category.name}</option>`
+  }
+
+  selTransferAccountFrom.innerHTML = accountHTML
+  selTransferAccountTo.innerHTML = accountHTML
+  selTransferCategory.innerHTML = categoryHTML
+
+  inpTransferDate.value = new Date().toISOString().slice(0, 10)
+  inpTransferAmount.value = 0
+  inpTransferDesc.value = ""
+}
+
+document.getElementById("btnAddTransfer").addEventListener("click", () =>{
+  let date = inpTransferDate.value
+  let accountFrom = selTransferAccountFrom.value
+  let accountTo = selTransferAccountTo.value
+  let amount = inpTransferAmount.value
+  let category = selTransferCategory.value
+  let desc = inpTransferDesc.value
+
+  let userID = User.findUserByName(localStorage.getItem(KEY_USER)).id
+
+  let transactionFrom = new Transaction(null,userID,date,-amount,
+    accountFrom,category,desc,null,false)
+  let transactionTo = new Transaction(null,userID,date,amount,
+    accountTo,category,desc,null,false)
+  transactionFrom.insert(["trans_id","trans_transfer_id"])
+  .then(()=>transactionTo.insert(["trans_id","trans_transfer_id"]))
+  .then(()=>{updateDateSelected(); inpTransferAmount.value = 0; inpTransferDesc.value = ""})
+
+
+})
+
+User.selectAll()
+.then(()=>Category.selectWithCondition(`user_id = ${User.findUserByName(localStorage.getItem(KEY_USER)).id}`))
+.then(()=>Account.selectWithCondition(`user_id = ${User.findUserByName(localStorage.getItem(KEY_USER)).id}`))
+.then(()=>Transaction.selectWithCondition(`user_id = ${User.findUserByName(localStorage.getItem(KEY_USER)).id}`))
+.then(()=>main())
